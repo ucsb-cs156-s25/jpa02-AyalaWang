@@ -1,6 +1,7 @@
 package edu.ucsb.cs156.spring.hello;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,6 +71,41 @@ public class TeamTest {
         t2.setName("foo");
         t2.addMember("bar");
 
+        assertEquals(t1, t2); // This makes the hashCode() check meaningful
         assertEquals(t1.hashCode(), t2.hashCode());
+    }
+    @Test
+    public void testHashCode_differentTeams() {
+        Team t1 = new Team();
+        t1.setName("foo");
+        t1.addMember("bar");
+
+        Team t2 = new Team();
+        t2.setName("bar");
+        t2.addMember("baz");
+
+        assertNotEquals(t1.hashCode(), t2.hashCode());
+    }
+  
+    @Test
+    public void testHashCode_detectsORvsANDMutation() {
+        Team t1 = new Team();
+        t1.setName("ABC");
+        t1.addMember("XYZ");
+
+        int nameHash = t1.getName().hashCode();
+        int membersHash = t1.getMembers().hashCode();
+
+        int expectedHash = nameHash | membersHash;
+        int wrongHash = nameHash & membersHash;
+
+        System.out.println("name.hashCode(): " + nameHash);
+        System.out.println("members.hashCode(): " + membersHash);
+        System.out.println("Expected (|): " + expectedHash);
+        System.out.println("Wrong (&): " + wrongHash);
+        System.out.println("Actual hashCode(): " + t1.hashCode());
+
+        assertEquals(expectedHash, t1.hashCode());
+        assertNotEquals(wrongHash, t1.hashCode());
     }
 }
